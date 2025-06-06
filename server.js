@@ -116,8 +116,5 @@ app.use((req, res) => {
   });
 });
 
-// Start the server
-const PORT = process.env.PORT || 3003;
-app.listen(PORT, () => {
-  logger.info(`Server is running on port ${PORT}`);
-});
+// Export the app for serverless deployment
+module.exports = app;
