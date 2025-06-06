@@ -24,7 +24,7 @@
     }
   ],
   "env": {
-    "NODE_ENV": "production",
-    "ALLOWED_ORIGINS": "@allowed_origins"
+    "NODE_ENV": "production"
+   
   }
 }
