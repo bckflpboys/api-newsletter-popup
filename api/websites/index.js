@@ -110,4 +110,4 @@ module.exports = withMiddleware(async (req, res) => {
     status: 'error',
     message: 'Method not allowed'
   });
-}));
+});

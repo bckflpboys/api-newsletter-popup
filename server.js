@@ -1,5 +1,6 @@
 require('dotenv').config();
 const express = require('express');
+const mongoose = require('mongoose');
 const connectDB = require('./config/database');
 const cors = require('cors');
 const helmet = require('helmet');
@@ -115,15 +116,8 @@ app.use((req, res) => {
   });
 });
 
-// Connect to MongoDB
-mongoose.connect(process.env.MONGODB_URI)
-  .then(() => {
-    logger.info('Connected to MongoDB');
-    const PORT = process.env.PORT || 3003;
-    app.listen(PORT, () => {
-      logger.info(`Server is running on port ${PORT}`);
-    });
-  })
-  .catch((error) => {
-    logger.error('MongoDB connection error:', error);
-  });
+// Start the server
+const PORT = process.env.PORT || 3003;
+app.listen(PORT, () => {
+  logger.info(`Server is running on port ${PORT}`);
+});
