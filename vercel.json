@@ -24,7 +24,6 @@
     }
   ],
   "env": {
-    "MONGODB_URI": "@mongodb_uri",
     "NODE_ENV": "production",
     "ALLOWED_ORIGINS": "@allowed_origins"
   }
