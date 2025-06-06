@@ -1,6 +1,6 @@
 require('dotenv').config();
 const express = require('express');
-const mongoose = require('mongoose');
+const connectDB = require('./config/database');
 const cors = require('cors');
 const helmet = require('helmet');
 const mongoSanitize = require('express-mongo-sanitize');
@@ -91,6 +91,9 @@ app.use((req, res, next) => {
   }
   next();
 });
+
+// Connect to MongoDB
+connectDB();
 
 // Mount routes with proper prefix
 app.use('/api', routes);
