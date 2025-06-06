@@ -25,7 +25,8 @@
     "react-dom": "^18.2.0",
     "react-hot-toast": "^2.4.1",
     "react-router-dom": "^6.21.0",
-    "recharts": "^2.15.0"
+    "recharts": "^2.15.0",
+    "date-fns": "^3.6.0"
   },
   "devDependencies": {
     "@types/react": "^18.2.43",
