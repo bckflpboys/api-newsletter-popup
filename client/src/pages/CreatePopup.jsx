@@ -654,7 +654,20 @@ export default function CreatePopup() {
 
       const popupData = {
         name: values.name || 'My Popup',
-        ...values,
+        // Explicitly list root fields from 'values' that the Popup model expects
+        title: values.title,
+        description: values.description,
+        buttonText: values.buttonText,
+        backgroundColor: values.backgroundColor,
+        textColor: values.textColor,
+        buttonColor: values.buttonColor,
+        buttonTextColor: values.buttonTextColor,
+        borderColor: values.borderColor,
+        borderWidth: values.borderWidth,
+        // Add other direct properties from 'values' as needed by the Popup model root
+
+        websiteId: domain, // Added websiteId
+
         settings: {
           domain: {
             detected: values.settings.domain.detected || '',
