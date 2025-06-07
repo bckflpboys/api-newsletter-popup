@@ -2,32 +2,43 @@ const winston = require('winston');
 const path = require('path');
 
 const logger = winston.createLogger({
-  level: 'info',
+  level: process.env.LOG_LEVEL || 'info', // Allow configuring log level via env var
   format: winston.format.combine(
     winston.format.timestamp(),
+    winston.format.errors({ stack: true }), // Log stack traces for errors
     winston.format.json()
   ),
   transports: [
-    // Write all logs to separate files
-    new winston.transports.File({ 
-      filename: path.join(__dirname, '../logs/error.log'), 
-      level: 'error' 
-    }),
-    new winston.transports.File({ 
-      filename: path.join(__dirname, '../logs/security.log'),
-      level: 'warn'
-    }),
-    new winston.transports.File({ 
-      filename: path.join(__dirname, '../logs/combined.log') 
+    // Always log to console. Vercel will pick this up.
+    new winston.transports.Console({
+      format: winston.format.combine(
+        winston.format.colorize(), // Optional: for colored output locally
+        winston.format.simple()
+      )
     })
   ]
 });
 
-// If we're not in production, log to console as well
+// Only add file transports if NOT in production (e.g., for local development)
 if (process.env.NODE_ENV !== 'production') {
-  logger.add(new winston.transports.Console({
-    format: winston.format.simple()
+  logger.add(new winston.transports.File({ 
+    filename: path.join(__dirname, '../logs/error.log'), 
+    level: 'error' 
   }));
+  logger.add(new winston.transports.File({ 
+    filename: path.join(__dirname, '../logs/security.log'),
+    level: 'warn' // Or a custom level for security if you define one
+  }));
+  logger.add(new winston.transports.File({ 
+    filename: path.join(__dirname, '../logs/combined.log') 
+  }));
+  
+  // Ensure logs directory exists for local development
+  const fs = require('fs');
+  const logsDir = path.join(__dirname, '../logs');
+  if (!fs.existsSync(logsDir)) {
+    fs.mkdirSync(logsDir);
+  }
 }
 
 // Security event logging functions
