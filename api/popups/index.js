@@ -37,7 +37,26 @@ module.exports = withMiddleware(async (req, res) => {
 
   if (req.method === 'POST') {
     try {
-      const popup = new Popup(req.body);
+      const userId = req.auth?.userId;
+      if (!userId) {
+        // This should ideally not happen if Clerk auth is working correctly
+        logger.error('Critical: Attempt to create popup without authenticated userId.');
+        return res.status(401).json({
+          status: 'error',
+          message: 'Authentication failed: User ID not available for popup creation.'
+        });
+      }
+      // Ensure websiteId is also present in req.body, as it's required by the model
+      if (!req.body.websiteId) {
+        logger.warn('Popup creation attempt missing websiteId in request body.', { body: req.body });
+        return res.status(400).json({
+          status: 'error',
+          message: 'Website ID is required to create a popup and was not provided in the request body.'
+        });
+      }
+
+      const popupData = { ...req.body, userId: userId };
+      const popup = new Popup(popupData);
       await popup.validate();
       const savedPopup = await popup.save();
 
