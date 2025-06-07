@@ -48,7 +48,7 @@ function App() {
     >
       <MantineProvider theme={theme} withGlobalStyles withNormalizeCSS>
         <Notifications position="top-center" zIndex={1000} />
-        <BrowserRouter basename="/client" future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+        <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
           <Box>
             <Navbar />
           </Box>
