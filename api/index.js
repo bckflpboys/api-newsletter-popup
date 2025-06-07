@@ -31,8 +31,20 @@ const withMiddleware = (handler) => async (req, res) => {
     req.body = mongoSanitize.sanitize(req.body);
 
     // Add CORS headers
-    const allowedOrigins = (process.env.ALLOWED_ORIGINS || 'http://localhost:3000,http://localhost:5173').split(',');
+    const rawAllowedOriginsEnv = process.env.ALLOWED_ORIGINS;
+    const defaultOrigins = 'http://localhost:3000,http://localhost:5173';
+    const effectiveAllowedOriginsString = rawAllowedOriginsEnv || defaultOrigins;
+    const allowedOrigins = effectiveAllowedOriginsString.split(',');
     const origin = req.headers.origin;
+
+    // Temporary logging for CORS debugging
+    logger.info('CORS Check Details:', {
+      requestOrigin: origin,
+      allowedOriginsEnvVar: rawAllowedOriginsEnv, // What Vercel provides
+      effectiveAllowedOriginsString: effectiveAllowedOriginsString, // The string being split
+      parsedAllowedOriginsArray: allowedOrigins, // The final array for checking
+      isOriginActuallyAllowed: origin && allowedOrigins.includes(origin) // The result of the check
+    });
 
     if (!origin || allowedOrigins.includes(origin)) {
       res.setHeader('Access-Control-Allow-Origin', origin || '*');
