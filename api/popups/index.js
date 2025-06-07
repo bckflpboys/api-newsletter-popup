@@ -1,5 +1,6 @@
 const { withMiddleware } = require('../index');
 const Popup = require('../../models/Popup');
+const Website = require('../../models/Website'); // Import the Website model
 const { logger } = require('../../utils/logger');
 
 // GET /api/popups
@@ -55,8 +56,32 @@ module.exports = withMiddleware(async (req, res) => {
         });
       }
 
-      const popupData = { ...req.body, userId: userId };
-      const popup = new Popup(popupData);
+      const domainString = req.body.websiteId; // This is the domain string from the client
+      const currentUserId = req.auth.userId;
+
+      let website = await Website.findOne({ userId: currentUserId, domain: domainString });
+
+      if (!website) {
+        // If website doesn't exist for this user and domain, create it
+        logger.info(`Website not found for user ${currentUserId} and domain ${domainString}. Creating new website.`);
+        website = new Website({
+          userId: currentUserId,
+          domain: domainString,
+          name: domainString, // Use domain as name by default, can be updated later by user
+          status: 'active' // Or 'pending_verification' if you have a verification flow
+        });
+        await website.save();
+        logger.info(`New website created with ID: ${website._id}`);
+      }
+
+      // Prepare popup data, ensuring websiteId is the ObjectId from the Website document
+      const popupDataForModel = {
+        ...req.body,
+        userId: currentUserId,
+        websiteId: website._id // Use the ObjectId of the found/created website
+      };
+
+      const popup = new Popup(popupDataForModel);
       await popup.validate();
       const savedPopup = await popup.save();
 
