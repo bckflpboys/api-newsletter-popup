@@ -49,6 +49,28 @@ const withMiddleware = (handler) => async (req, res) => {
       return res.status(200).end();
     }
 
+    // --- START CLERK AUTHENTICATION ---
+    const authMiddleware = ClerkExpressRequireAuth(); // Using default options
+    await new Promise((resolve, reject) => {
+      authMiddleware(req, res, (err) => { // err is the argument to next(err)
+        if (err) {
+          // Clerk middleware indicated an error (e.g., misconfiguration)
+          // This will be caught by the outer try/catch in withMiddleware
+          return reject(err);
+        }
+        // If no error, Clerk middleware either sent a response (401/403 for auth failure)
+        // or called next() (auth success, req.auth populated).
+        resolve(undefined);
+      });
+    });
+
+    // If Clerk middleware sent a response (e.g., 401 Unauthorized), stop further processing.
+    if (res.headersSent) {
+      return;
+    }
+    // --- END CLERK AUTHENTICATION ---
+    // If we reach here, authentication was successful and req.auth is populated.
+
     // Execute the handler
     return await handler(req, res);
   } catch (error) {
